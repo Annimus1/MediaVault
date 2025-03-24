@@ -1,0 +1,25 @@
+{
+  "name": "mediavault",
+  "version": "1.0.0",
+  "description": "Personal API for managing and recording completed movies, series, anime, books, and video games. Allows you to categorize, rate, and track your entertainment consumption yearly.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "entertainment-tracker",
+    "media-organizer",
+    "personal-api",
+    "movies",
+    "books",
+    "anime",
+    "gaming"
+  ],
+  "author": "Pablo Vergara",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
