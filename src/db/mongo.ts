@@ -3,9 +3,9 @@ import { User } from '../utils/types.js';
 import { UserSchema } from './Models/User.js';
 import { AuthTokenModel } from './Models/Auth.js';
 
-const connectionString = 'mongodb://user:password@localhost:27017/mediavault?authSource=admin';
+const connectionString = process.env.CONNECTION_STRING || 'mongodb://user:password@localhost:27017/mediavault?authSource=admin';
 
-export const dbConnection = async () => await mongoose.connect(connectionString)
+export const dbConnection = async () => await mongoose.connect(connectionString!)
   .then(() => console.log("Database connected"))
   .catch((_error: Error) => console.log('Unable to connect database.'));
 
