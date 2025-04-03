@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { User } from "../utils/types.js";
-import { parseUser } from "../utils/utils.js";
+import { User, UserLogin } from "../utils/types.js";
+import { parseLogin, parseUser } from "../utils/utils.js";
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import 'dotenv/config'
-import { createUser, saveToken, userExists } from "../db/mongo.js";
+import { createUser, getUser, ownerHasToken, revokeToken, saveToken, userExists } from "../db/mongo.js";
 
 const router = Router();
 
@@ -15,23 +15,35 @@ router.post("/login", async (req, res) => {
   try {
     const secretKey = process.env.SECRET_KEY;
     if (!secretKey) {
-      console.error("SECRET_KEY no está definido en las variables de entorno");
+      console.error("SECRET_KEY not defined.");
       res.status(500).send();
       return
     }
 
-    const incomingUser: User = parseUser(req.body);
+    const incomingUser: UserLogin = parseLogin(req.body);
 
-    /**
-     * check if user match in database
-     * redirect to / (get all media)
-     */
+    // get user from database
+    const userDB = await getUser(incomingUser.user);
+    if (!userDB) {
+      res.status(401).send({ message: "user or password wrong." });
+      return
+    }
 
-    // hash password
-    // const hashedPassword = await bcrypt.hash(incomingUser.password, 10);
+    if (!bcrypt.compareSync(incomingUser.password, userDB.password)) {
+      res.status(401).send({ message: "user or password wrong." })
+      return
+    }
 
     // create jwt
     const token = jwt.sign({ user: incomingUser.user }, secretKey!, { expiresIn: '1d' })
+
+    // add token into db
+    if (await ownerHasToken(userDB._id.toString())) {
+      await revokeToken(userDB._id.toString());
+      await saveToken(userDB._id.toString(), token)
+    }else{
+      saveToken(userDB._id.toString(), token);
+    }
 
     res.send({ token: token });
   } catch (error: any) {
@@ -56,7 +68,7 @@ router.post("/register", async (req, res) => {
     // create jwt
     const token = jwt.sign({ user: incomingUser.user }, secretKey!, { expiresIn: '1d' })
 
-    // verify is user already exists
+    // verify if user already exists
     if (! await userExists(incomingUser)) {
       // add hashed password to user
       incomingUser.password = hashedPassword;
@@ -64,10 +76,9 @@ router.post("/register", async (req, res) => {
       // save user in database
       createUser(incomingUser)
         .then(user => {
-          let expirationInHours = 24;
           console.log('User created:', user);
           // add token into db
-          saveToken(user._id.toString(), token,  expirationInHours);
+          saveToken(user._id.toString(), token);
           res.status(201).send({ token: token })
         })
         .catch(err => {
@@ -85,7 +96,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/logout", (_req, res) => {
-  res.status(501).send();
+  res.status(501).send()
 });
 
 export default router;

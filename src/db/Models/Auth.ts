@@ -2,7 +2,7 @@ import { Schema, model } from 'mongoose';
 import { IAuthToken } from '../../utils/types';
 
 
-// 2. Definir el esquema Mongoose
+// Define Mongoose schema
 const authTokenSchema = new Schema<IAuthToken>({
   owner: {
     type: Schema.Types.ObjectId,

@@ -1,4 +1,4 @@
-import { User } from "./types.js";
+import { User, UserLogin } from "./types.js";
 
 /**
  * Parses and validates user input to ensure it matches the User type requirements.
@@ -14,29 +14,51 @@ import { User } from "./types.js";
  * parseUser({ user: 123, password: 'secure123', email: 'john@example.com' });
  */
 export function parseUser(incomingUser: any): User {
-    if (
-        incomingUser.hasOwnProperty("user") &&
-        incomingUser.hasOwnProperty("password") &&
-        incomingUser.hasOwnProperty("email")
-    ) {
-        if (!isString(incomingUser.user)) {
-            throw new TypeError("'user' must be a String.");
-        }
-        if (!isString(incomingUser.password)) {
-            throw new TypeError("'password' must be a String.");
-        }
-        if (!isString(incomingUser.email) || !isValidEmail(incomingUser.email)) {
-            throw new TypeError("Not valid email.");
-        }
-
-        return { 
-            user: incomingUser.user, 
-            password: incomingUser.password, 
-            email: incomingUser.email 
-        };
-    } else {
-        throw new TypeError("'user', 'email' or 'password' property missing.");
+  if (
+    incomingUser.hasOwnProperty("user") &&
+    incomingUser.hasOwnProperty("password") &&
+    incomingUser.hasOwnProperty("email")
+  ) {
+    if (!isString(incomingUser.user)) {
+      throw new TypeError("'user' must be a String.");
     }
+    if (!isString(incomingUser.password)) {
+      throw new TypeError("'password' must be a String.");
+    }
+    if (!isString(incomingUser.email) || !isValidEmail(incomingUser.email)) {
+      throw new TypeError("Not valid email.");
+    }
+
+    return {
+      user: incomingUser.user,
+      password: incomingUser.password,
+      email: incomingUser.email
+    };
+  } else {
+    throw new TypeError("'user', 'email' or 'password' property missing.");
+  }
+}
+
+export function parseLogin(incomingUser: any): UserLogin {
+  if (
+    incomingUser.hasOwnProperty('user') &&
+    incomingUser.hasOwnProperty('password')
+  ) {
+    if (!isString(incomingUser.user)) {
+      throw new TypeError("'user' must be a String.");
+    }
+    if (!isString(incomingUser.password)) {
+      throw new TypeError("'password' must be a String.");
+    }
+
+    return {
+      user: incomingUser.user,
+      password: incomingUser.password
+    }
+
+  } else {
+    throw new TypeError("'user' or 'password' property missing.");
+  }
 }
 
 /**
@@ -49,7 +71,7 @@ export function parseUser(incomingUser: any): User {
  * isString(123); // false
  */
 function isString(param: any): boolean {
-    return (typeof param === 'string' || param instanceof String);
+  return (typeof param === 'string' || param instanceof String);
 }
 
 /**
@@ -62,10 +84,10 @@ function isString(param: any): boolean {
  * @see RFC 5322 for email specification
  */
 function isValidEmail(param: any): boolean {
-    const validEmail = String(param)
-        .toLowerCase()
-        .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
-    return validEmail !== null;
+  const validEmail = String(param)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+  return validEmail !== null;
 }

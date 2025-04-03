@@ -65,6 +65,38 @@ export async function userExists(user: User): Promise<boolean> {
   }
 }
 
+/**
+ * Retrieves a user from the database by their email address
+ * @async
+ * @function getUser
+ * @param {string} user - The email address of the user to retrieve
+ * @returns {Promise<User|null>} Returns:
+ * - The User document if found
+ * - `null` if no user exists with the provided email
+ * @throws {Error} If there's a database query error
+ * @example
+ * // Get user by email
+ * try {
+ *   const user = await getUser('user@example.com');
+ *   if (user) {
+ *     console.log('User found:', user);
+ *   } else {
+ *     console.log('User not found');
+ *   }
+ * } catch (error) {
+ *   console.error('Error fetching user:', error.message);
+ * }
+ */
+export async function getUser(user: string): Promise<any> {
+  try {
+    let query = UserSchema.find({ email: user });
+    const users = await query.exec();    
+    return users.length > 0 ? users[0] : null;
+  } catch (error: any) {
+    throw new Error(`Error retrieving users: ${error.message}`);
+  }
+}
+
 
 //### TOKENS
 
@@ -99,4 +131,52 @@ export async function saveToken(
   });
 
   await authToken.save();
+}
+
+/**
+ * Revokes all authentication tokens associated with a specific user
+ * @async
+ * @function revokeToken
+ * @param {string} owner - The user's ID whose tokens should be revoked
+ * @returns {Promise<void>} Resolves when the operation is complete
+ * @throws {Error} If the token revocation fails
+ * @example
+ * // Revoke all tokens for user with ID '507f1f77bcf86cd799439011'
+ * await revokeToken('507f1f77bcf86cd799439011');
+ * console.log('All tokens revoked successfully');
+ */
+export async function revokeToken(owner: string): Promise<void> {
+  let query = AuthTokenModel.deleteOne({ owner: owner });
+  const tokens = await query.exec();
+  console.log(`revoked token ${tokens}`);
+}
+
+/**
+ * Checks if a user currently has any active authentication tokens
+ * @async
+ * @function ownerHasToken
+ * @param {string} owner - The user's ID to check for active tokens
+ * @returns {Promise<boolean>} Returns:
+ * - `true` if the user has at least one active token
+ * - `false` if no tokens exist for this user
+ * @throws {Error} If the database query fails
+ * @example
+ * // Check if user has active tokens
+ * const hasToken = await ownerHasToken('507f1f77bcf86cd799439011');
+ * if (hasToken) {
+ *   console.log('User has active sessions');
+ * } else {
+ *   console.log('No active sessions found');
+ * }
+ */
+export async function ownerHasToken(owner: string): Promise<boolean> {
+  let query = AuthTokenModel.find({ owner: owner });
+  const tokens = await query.exec();
+  return tokens.length > 0 ? true : false;
+}
+
+export async function showTokens(): Promise<void>{
+  let query =   AuthTokenModel.find({});
+    const tokens = await query.exec();
+    console.log(tokens);
 }

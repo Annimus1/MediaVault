@@ -6,6 +6,11 @@ export type User = {
     password: string
 }
 
+export type UserLogin = {
+  user: string,
+  password: string
+}
+
 export type UserDTO = Omit<User, password, email>
 
 export interface Media {
