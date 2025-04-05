@@ -66,37 +66,39 @@ export async function userExists(user: User): Promise<boolean> {
 }
 
 /**
- * Retrieves a user from the database by their email address
+ * Retrieves a user from the database by email or username
  * @async
  * @function getUser
- * @param {string} user - The email address of the user to retrieve
- * @returns {Promise<User|null>} Returns:
- * - The User document if found
- * - `null` if no user exists with the provided email
- * @throws {Error} If there's a database query error
+ * @param {string} user - Email address or username to search for
+ * @returns {Promise<any>} Returns:
+ * - User document if found (either by email or username)
+ * - null if no user matches the search criteria
+ * @throws {Error} When there is a database query error
  * @example
- * // Get user by email
- * try {
- *   const user = await getUser('user@example.com');
- *   if (user) {
- *     console.log('User found:', user);
- *   } else {
- *     console.log('User not found');
- *   }
- * } catch (error) {
- *   console.error('Error fetching user:', error.message);
+ * // Find user by email or username
+ * const user = await getUser('test@example.com');
+ * if (user) {
+ *   // User exists
+ * } else {
+ *   // User not found
  * }
  */
 export async function getUser(user: string): Promise<any> {
   try {
-    let query = UserSchema.find({ email: user });
-    const users = await query.exec();    
-    return users.length > 0 ? users[0] : null;
+    const emailQuery = UserSchema.findOne({ email: user });
+    const userQuery = UserSchema.findOne({ user: user });
+    
+    let response = await emailQuery.exec();    
+
+    if (response) return response;
+    
+    response = await userQuery.exec();
+
+    return response;
   } catch (error: any) {
     throw new Error(`Error retrieving users: ${error.message}`);
   }
 }
-
 
 //### TOKENS
 
@@ -110,7 +112,22 @@ export async function getUser(user: string): Promise<any> {
  * @returns {Promise<void>} Resolves when token is successfully saved
  * @throws {Error} If token saving fails
  * @example
- * // Save a token with default expiration (24h)
+ export async function getUser(user: string): Promise<any> {
+  try {
+    const emailQuery = UserSchema.findOne({ email: user });
+    const userQuery = UserSchema.findOne({ user: user });
+    
+    let response = await emailQuery.exec();    
+
+    if (response) return response;
+    
+    response = await userQuery.exec();
+
+    return response;
+  } catch (error: any) {
+    throw new Error(`Error retrieving users: ${error.message}`);
+  }
+}* // Save a token with default expiration (24h)
  * await saveToken('507f1f77bcf86cd799439011', 'eyJhbGci...');
  * 
  * // Save a token with custom expiration (48h)
