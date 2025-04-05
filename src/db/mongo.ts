@@ -87,11 +87,11 @@ export async function getUser(user: string): Promise<any> {
   try {
     const emailQuery = UserSchema.findOne({ email: user });
     const userQuery = UserSchema.findOne({ user: user });
-    
-    let response = await emailQuery.exec();    
+
+    let response = await emailQuery.exec();
 
     if (response) return response;
-    
+
     response = await userQuery.exec();
 
     return response;
@@ -134,8 +134,8 @@ export async function getUser(user: string): Promise<any> {
  * await saveToken('507f1f77bcf86cd799439011', 'eyJhbGci...', 48);
  */
 export async function saveToken(
-  userId: string, 
-  token: string, 
+  userId: string,
+  token: string,
   expiresInHours: number = 24
 ): Promise<void> {
   const expiresAt = new Date();
@@ -192,8 +192,36 @@ export async function ownerHasToken(owner: string): Promise<boolean> {
   return tokens.length > 0 ? true : false;
 }
 
-export async function showTokens(): Promise<void>{
-  let query =   AuthTokenModel.find({});
-    const tokens = await query.exec();
-    console.log(tokens);
+/**
+ * Retrieves an authentication token document from the database by token string
+ * @async
+ * @function getToken
+ * @param {string} token - The JWT token string to search for
+ * @returns {Promise<AuthTokenDocument|null>} Returns:
+ * - The authentication token document if found
+ * - `null` if no matching token is found
+ * @throws {Error} If there is a database query error
+ * @example
+ * // Find token in database
+ * try {
+ *   const tokenDoc = await getToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...');
+ *   if (tokenDoc) {
+ *     console.log('Token found, expires at:', tokenDoc.expiresAt);
+ *   } else {
+ *     console.log('Token not found in database');
+ *   }
+ * } catch (error) {
+ *   console.error('Error searching for token:', error.message);
+ * }
+ */
+export async function getToken(token: string): Promise<any> {
+  let query = AuthTokenModel.findOne({ token: token });
+  const response = await query.exec();
+  return response;
+}
+
+export async function showTokens(): Promise<void> {
+  let query = AuthTokenModel.find({});
+  const tokens = await query.exec();
+  console.log(tokens);
 }
