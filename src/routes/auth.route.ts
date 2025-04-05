@@ -35,7 +35,7 @@ router.post("/login", async (req, res) => {
     }
 
     // create jwt
-    const token = jwt.sign({ user: incomingUser.user }, secretKey!, { expiresIn: '1d' })
+    const token = jwt.sign({ user: { user: incomingUser.user, id: userDB._id.toString() } }, secretKey!, { expiresIn: '1d' })
 
     // add token into db
     if (await ownerHasToken(userDB._id.toString())) {
@@ -65,9 +65,6 @@ router.post("/register", async (req, res) => {
     // hash password
     const hashedPassword = await bcrypt.hash(incomingUser.password, 10);
 
-    // create jwt
-    const token = jwt.sign({ user: incomingUser.user }, secretKey!, { expiresIn: '1d' })
-
     // verify if user already exists
     if (! await userExists(incomingUser)) {
       // add hashed password to user
@@ -77,7 +74,11 @@ router.post("/register", async (req, res) => {
       createUser(incomingUser)
         .then(user => {
           console.log('User created:', user);
-          // add token into db
+     
+        // create jwt
+        const token = jwt.sign( {user : { user: incomingUser.user, id: user._id.toString()}},  secretKey!, { expiresIn: '1d' })
+
+         // add token into db
           saveToken(user._id.toString(), token);
           res.status(201).send({ token: token })
         })
