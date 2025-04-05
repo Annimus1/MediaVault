@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { User, UserLogin } from "../utils/types.js";
-import { parseLogin, parseUser } from "../utils/utils.js";
+import { parseLogin, parseUser } from "../utils/parser.js";
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import 'dotenv/config'
