@@ -4,7 +4,7 @@ export enum Language {
     "SubJap" = "sub-spanish"
 }
 
-export enum mediaType {
+export enum MediaType {
     "Movie" = "movie",
     "Serie" = "serie",
     "Anime" = "anime",

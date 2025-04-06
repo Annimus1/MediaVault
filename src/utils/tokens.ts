@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
-import { getToken } from "../db/mongo";
+import { getToken } from "../db/mongo.js";
+import { Token } from "./types";
 
 /**
  * Verifies if a JWT token is cryptographically valid
@@ -53,5 +54,38 @@ export async function activeToken(token: string): Promise<boolean> {
   } catch (error: any) {
     console.log('Error: ', error.message);
     return false;
+  }
+}
+
+
+/**
+ * Extracts and verifies user information from a JWT token
+ * 
+ * @function getUserInfo
+ * @param {string} token - The JWT token to verify and decode
+ * @param {string} secretKey - The secret key used to verify the token signature
+ * @returns {Token | null} Returns:
+ * - The decoded Token payload if verification succeeds
+ * - `null` if the token is invalid, expired, or verification fails
+ * @throws {Error} If the token verification fails (error is logged to console)
+ * 
+ * @example
+ * // Example of successful token decoding
+ * const userInfo = getUserInfo('eyJhbGci...', 'your-secret-key');
+ * if (userInfo) {
+ *   console.log('User ID:', userInfo.userId);
+ * } else {
+ *   console.log('Invalid or expired token');
+ * }
+ * 
+ * @see {@link jwt.verify} For token verification details
+ */
+export function getUserInfo( token: string, secretKey: string): Token | null {
+  try{
+    const payload: Token = jwt.verify(token, secretKey) as Token;
+    return payload;
+  }catch(error:any){
+    console.log(`Error while extracting payload: ${error.message}`)
+    return null;
   }
 }

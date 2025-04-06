@@ -1,5 +1,5 @@
 import {Schema, model} from "mongoose";
-import { Language, mediaType } from "../../utils/enums.js";
+import { Language, MediaType } from "../../utils/enums.js";
 import { MediaSchema } from "../../utils/types.js";
 
 
@@ -13,7 +13,7 @@ const mediaSchema = new Schema<MediaSchema>({
     mediaType: { 
       type: String,
       required: true,
-      enum: mediaType
+      enum: MediaType
     },
     language: {
       type: String,
@@ -22,5 +22,5 @@ const mediaSchema = new Schema<MediaSchema>({
     }
   });
 
-export const Media = model('Media', mediaSchema);
+export const MediaModel = model('Media', mediaSchema);
 

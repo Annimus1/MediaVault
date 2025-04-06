@@ -1,13 +1,15 @@
 import mongoose from 'mongoose';
-import { User } from '../utils/types.js';
+import { Media, User } from '../utils/types.js';
 import { UserSchema } from './Models/User.js';
 import { AuthTokenModel } from './Models/Auth.js';
+import { MediaModel } from './Models/Media.js';
 
 const connectionString = process.env.CONNECTION_STRING || 'mongodb://user:password@localhost:27017/mediavault?authSource=admin';
 
 export const dbConnection = async () => await mongoose.connect(connectionString!)
   .then(() => console.log("Database connected"))
   .catch((_error: Error) => console.log('Unable to connect database.'));
+
 
 // ### USER FUNCTIONS
 
@@ -100,7 +102,7 @@ export async function getUser(user: string): Promise<any> {
   }
 }
 
-//### TOKENS
+//### TOKENS FUNCTIONS
 
 /**
  * Saves a JWT token to the database with expiration time
@@ -220,8 +222,67 @@ export async function getToken(token: string): Promise<any> {
   return response;
 }
 
-export async function showTokens(): Promise<void> {
-  let query = AuthTokenModel.find({});
-  const tokens = await query.exec();
-  console.log(tokens);
+
+// ### MEDIA FUNCTIONS
+
+/**
+ * Retrieves media items for a specific user with pagination
+ * @async
+ * @function getMedia
+ * @param {string} userId - The owner's user ID
+ * @param {number} [skip=0] - Number of items to skip (for pagination)
+ * @returns {Promise<Media[]>} Array of Media objects without Mongoose metadata
+ * @throws {Error} If there's a database error
+ */
+export async function getMedia(userId: string, skip: number = 0): Promise<Media[]> {
+  const result = await MediaModel.find({owner: userId })
+    .select('owner name completedDate score poster mediaType language comment')
+    .limit(10)
+    .skip(skip)
+    .lean()
+    .exec();
+  console.log(result);
+  
+  return result as unknown as Media[];
+}
+
+/**
+ * Saves a media item to the database
+ * 
+ * @async
+ * @param {Media} media - The media object to be saved. Must conform to the Media interface.
+ * @returns {Promise<void>} Resolves when the media is successfully saved.
+ * @throws {Error} If there is an error during the save operation. The original error is logged to console.
+ * 
+ * @example
+ * // Example usage
+ * const newMedia = {
+ *   owner: 'user123',
+ *   name: 'Inception',
+ *   completedDate: '2023-05-15',
+ *   score: 9.5,
+ *   poster: 'http://example.com/poster.jpg',
+ *   mediaType: 'Movie',
+ *   language: 'English'
+ * };
+ * 
+ * try {
+ *   await saveMedia(newMedia);
+ *   console.log('Media saved successfully');
+ * } catch (error) {
+ *   console.error('Failed to save media:', error.message);
+ * }
+ * 
+ * @see {@link Media} for the expected media object structure
+ * @see {@link MediaModel} for the underlying Mongoose model
+ */
+export async function saveMedia(media: Media): Promise<void> {
+  try {
+    let model = new MediaModel(media);
+    await model.save();
+  }
+  catch (error: any) {
+    console.error("Error while saving media:", error.message);
+    throw new Error("Error while saving Media.");
+  }
 }

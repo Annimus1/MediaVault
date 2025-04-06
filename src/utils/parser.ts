@@ -1,4 +1,5 @@
-import { User, UserLogin } from "./types.js";
+import { Language, MediaType } from "./enums.js";
+import { Media, User, UserLogin } from "./types.js";
 
 /**
  * Parses and validates user input to ensure it matches the User type requirements.
@@ -90,4 +91,149 @@ function isValidEmail(param: any): boolean {
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
   return validEmail !== null;
+}
+
+/**
+ * Validates if a parameter can be parsed as a valid Date
+ * @param {any} param - The value to validate
+ * @returns {boolean} Returns `true` if the parameter is a valid date string or Date object, `false` otherwise
+ * @example
+ * isDate("2023-05-15"); // true
+ * isDate("invalid-date"); // false
+ */
+function isDate(param: any): boolean {
+  return Date.parse(param) ? true : false;
+}
+
+/**
+ * Validates if a number is within the acceptable range (0.0 to 10.0)
+ * @param {any} param - The value to validate (number or string representation)
+ * @returns {boolean} Returns:
+ * - `true` if the parameter is a valid number within range
+ * - `false` if the parameter is outside range or not convertible to a number
+ * @example
+ * isNumberValid(5.5); // true
+ * isNumberValid("7.2"); // true
+ * isNumberValid(11); // false
+ */
+function isNumberValid(param: any): boolean {
+  const maxRange = 10.0;
+  const minRange = 0.0;
+
+  if (typeof param === 'number') {
+    return !(param < minRange || param > maxRange);
+  } else {
+    const result = parseFloat(param);
+    return !!result && !(result < minRange || result > maxRange);
+  }
+}
+
+/**
+ * Validates if a parameter is a valid MediaType enum value
+ * @param {any} param - The value to validate
+ * @returns {boolean} Returns `true` if the parameter matches a MediaType enum value (case-insensitive)
+ * @throws {TypeError} If the parameter is not a string
+ * @example
+ * // Assuming MediaType includes 'MOVIE', 'SERIES'
+ * isMediaType("movie"); // true
+ * isMediaType("THEATER"); // false
+ * @see {@link MediaType} For available values
+ */
+function isMediaType(param: any): boolean {
+  if (isString(param)) {
+    return Object.values(MediaType).includes(param.toLowerCase());
+  }
+  throw new TypeError("Parameter must be a string");
+}
+
+/**
+ * Validates if a parameter is a valid Language enum value
+ * @param {any} param - The value to validate
+ * @returns {boolean} Returns `true` if the parameter matches a Language enum value (case-insensitive)
+ * @throws {TypeError} If the parameter is not a string
+ * @example
+ * // Assuming Language includes 'English', 'Espanish'
+ * isLanguage("Spanish"); // true
+ * isLanguage("French"); // false
+ * @see {@link Language} For available values
+*/
+function isLanguage(param: any): boolean {
+  if (isString(param)) {
+    return Object.values(Language).includes(param.toLowerCase());
+  }
+  throw new TypeError("Parameter must be a string");
+}
+
+/**
+ * Parses and validates raw media data into a properly formatted Media object
+ * 
+ * @function parseMedia
+ * @param {any} media - The raw media data object to parse
+ * @param {string} owner - The owner/creator ID to associate with the media
+ * @returns {Media} A validated and properly formatted Media object
+ * @throws {TypeError} If:
+ * - Any required property is missing
+ * - Any property fails type validation
+ * - MediaType or Language values are invalid
+ * 
+ * @example
+ * // Successful parsing
+ * const validMedia = {
+ *   name: "Inception",
+ *   completedDate: "2023-05-15",
+ *   score: 9.5,
+ *   poster: "http://example.com/poster.jpg",
+ *   mediaType: "movie",
+ *   language: "english",
+ *   comment: "Great film!"
+ * };
+ * const parsed = parseMedia(validMedia, "user123");
+ * 
+ * @example
+ * // Throws TypeError
+ * parseMedia({ name: 123 }, "user123"); // Invalid name type
+ * 
+ * @see {@link isDate} For date validation
+ * @see {@link isNumberValid} For score validation
+ * @see {@link isMediaType} For media type validation
+ * @see {@link isLanguage} For language validation
+ */
+export function parseMedia(media: any, owner: string): Media {
+  if (
+    media.hasOwnProperty('name') &&
+    media.hasOwnProperty('completedDate') &&
+    media.hasOwnProperty('score') &&
+    media.hasOwnProperty('poster') &&
+    media.hasOwnProperty('mediaType') &&
+    media.hasOwnProperty('language') &&
+    media.hasOwnProperty('comment')
+  ) {
+
+    // Validate all properties
+    if (!isString(media.name)) throw new TypeError("Property 'name' must be a string.");
+    if (media.comment && !isString(media.comment)) throw new TypeError("Property 'comment' must be a string.");
+    if (!isDate(media.completedDate)) throw new TypeError("Property 'completedDate' must be in date format (YYYY-MM-DD)");
+    if (!isNumberValid(media.score)) throw new TypeError("Property 'score' must be a number between 0 and 10.");
+    if (!isString(media.poster)) throw new TypeError("Property 'poster' must be a string.");
+    if (!isMediaType(media.mediaType)) throw new TypeError("Invalid media type.");
+    if (!isLanguage(media.language)) throw new TypeError("Invalid language.");
+
+    // Format enum values
+    const _type = media.mediaType.toLowerCase();
+    const _lang = media.language.toLowerCase();
+
+    return {
+      owner: owner,
+      name: media.name,
+      completedDate: media.completedDate,
+      score: media.score,
+      comment: media.comment,
+      poster: media.poster,
+      mediaType: _type,
+      language: _lang
+    };
+
+  } else {
+    throw new TypeError("Missing required properties. Needed: name, completedDate, score, poster, mediaType, language, comment");
+  }
 }

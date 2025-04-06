@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { activeToken, validToken } from "./tokens";
+import { activeToken, validToken } from "./tokens.js";
 
 /**
  * Express authentication middleware that validates JWT tokens

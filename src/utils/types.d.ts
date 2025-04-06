@@ -14,8 +14,7 @@ export type UserLogin = {
 export type UserDTO = Omit<User, password, email>
 
 export interface Media {
-    id: string,
-    owner: UserDTO,
+    owner: string,
     name: string,
     completedDate: Date,
     score: Number,
@@ -31,4 +30,13 @@ export interface IAuthToken extends Document {
   token: string;          // Token JWT
   createdAt: Date;        // Fecha de creación (auto)
   expiresAt: Date;        // Fecha de expiración
+}
+
+export interface Token{
+  "user": {
+    "user": string,
+    "id": string
+  };
+  "iat": number;
+  "exp": number;
 }
