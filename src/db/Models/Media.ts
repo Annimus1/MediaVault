@@ -1,26 +1,26 @@
-import {Schema, model} from "mongoose";
+import { Schema, model } from "mongoose";
 import { Language, MediaType } from "../../utils/enums.js";
 import { MediaSchema } from "../../utils/types.js";
 
 
 const mediaSchema = new Schema<MediaSchema>({
-    owner: { type: Object, required: true },
-    name: { type: String, required: true },
-    completedDate: { type: Date, required: true },
-    score: { type: Number, min: 0, max: 10 },
-    comment: String,
-    poster: String,
-    mediaType: { 
-      type: String,
-      required: true,
-      enum: MediaType
-    },
-    language: {
-      type: String,
-      required: true,
-      enum: Language
-    }
-  });
+  owner: { type: Object, required: true },
+  name: { type: String, required: true, unique: false },
+  completedDate: { type: Date, required: true },
+  score: { type: Number, min: 0, max: 10 },
+  comment: { type: String, required: false },
+  poster: { type: String, required: true },
+  mediaType: {
+    type: String,
+    required: true,
+    enum: MediaType
+  },
+  language: {
+    type: String,
+    required: true,
+    enum: Language
+  }
+});
 
 export const MediaModel = model('Media', mediaSchema);
 

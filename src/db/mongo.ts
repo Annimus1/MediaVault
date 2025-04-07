@@ -241,7 +241,6 @@ export async function getMedia(userId: string, skip: number = 0): Promise<Media[
     .skip(skip)
     .lean()
     .exec();
-  console.log(result);
   
   return result as unknown as Media[];
 }

@@ -71,7 +71,7 @@ export function parseLogin(incomingUser: any): UserLogin {
  * isString(new String('test')); // true
  * isString(123); // false
  */
-function isString(param: any): boolean {
+export function isString(param: any): boolean {
   return (typeof param === 'string' || param instanceof String);
 }
 
@@ -101,7 +101,7 @@ function isValidEmail(param: any): boolean {
  * isDate("2023-05-15"); // true
  * isDate("invalid-date"); // false
  */
-function isDate(param: any): boolean {
+export function isDate(param: any): boolean {
   return Date.parse(param) ? true : false;
 }
 
@@ -116,7 +116,7 @@ function isDate(param: any): boolean {
  * isNumberValid("7.2"); // true
  * isNumberValid(11); // false
  */
-function isNumberValid(param: any): boolean {
+export function isNumberValid(param: any): boolean {
   const maxRange = 10.0;
   const minRange = 0.0;
 
