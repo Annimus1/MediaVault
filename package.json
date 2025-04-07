@@ -7,9 +7,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "tsx watch ./src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "vercel-build": "npm run build"
+    "dev": "tsx watch ./src/index.ts"
   },
   "keywords": [
     "entertainment-tracker",
