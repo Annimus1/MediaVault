@@ -1,5 +1,5 @@
-import { isDate, isNumberValid, isString } from "./parser";
-import { Media } from "./types";
+import { isDate, isNumberValid, isString } from "./parser.js";
+import { Media } from "./types.js";
 
 /**
  * Filters media results based on query parameters
