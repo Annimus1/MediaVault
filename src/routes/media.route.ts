@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import authMiddleware from '../utils/AuthMiddleware.js';
 import { getUserInfo } from '../utils/tokens.js';
-import { getMedia, saveMedia } from '../db/mongo.js';
+import { deleteMediaById, getMedia, getMediaById, saveMedia } from '../db/mongo.js';
 import { parseMedia } from '../utils/parser.js';
 import { filteredMedia } from '../utils/filterMedia.js';
 
@@ -81,8 +81,69 @@ router.post('/addMedia', async (req, res) => {
   }
 });
 
-router.get('/:id', (_req, res) => {
-  res.status(501).send()
+router.get('/:id', async (req, res) => {
+  try{
+    // check if secret key is defined.
+    const secretKey = process.env.SECRET_KEY;
+    if (!secretKey) {
+      console.error("Secret key is not dfined.");
+      throw new Error("Secret key is not dfined.");
+    }
+    
+    // get id from path
+    const id = req.path.split('/')[1]
+   
+    
+    //get media by id
+    const result = await getMediaById(id);    
+
+    result ? res.json(result) : res.status(404).send();    
+  }catch (error: any){
+    
+    if(error.message.includes('Cast to ObjectId failed')){
+      res.sendStatus(404);
+    }
+
+    if(error instanceof TypeError){
+      res.status(400).send({message: error.message});
+      return 
+    }
+
+    res.status(500).send();
+    return;
+  }
+});
+
+router.delete('/:id', async (req, res) => {
+  try{
+    // check if secret key is defined.
+    const secretKey = process.env.SECRET_KEY;
+    if (!secretKey) {
+      console.error("Secret key is not dfined.");
+      throw new Error("Secret key is not dfined.");
+    }
+    
+    // get id from path
+    const id = req.path.split('/')[1]
+    
+    //get media by id
+    const result = await deleteMediaById(id);    
+
+    result ? res.json(result) : res.status(404).send();    
+  }catch (error: any){
+    
+    if(error.message.includes('Cast to ObjectId failed')){
+      res.sendStatus(404);
+    }
+
+    if(error instanceof TypeError){
+      res.status(400).send({message: error.message});
+      return 
+    }
+
+    res.status(500).send();
+    return;
+  }
 });
 
 

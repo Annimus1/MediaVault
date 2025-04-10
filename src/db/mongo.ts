@@ -285,3 +285,55 @@ export async function saveMedia(media: Media): Promise<void> {
     throw new Error("Error while saving Media.");
   }
 }
+
+/**
+ * Retrieves a media item by its unique identifier
+ * @async
+ * @param {string} id - The MongoDB ObjectId of the media item to retrieve
+ * @returns {Promise<Media | null>} A promise that resolves to:
+ * - The Media object if found
+ * - null if no media matches the provided ID
+ * @throws {CastError} If the provided ID is not a valid MongoDB ObjectId
+ * @throws {MongoError} If there's a database operation error
+ * @example
+ * // Example of successful retrieval
+ * const media = await getMediaById('507f1f77bcf86cd799439011');
+ * if (media) {
+ *   console.log('Found media:', media.name);
+ * } else {
+ *   console.log('Media not found');
+ * }
+ * 
+ * @see {@link MediaModel} for the underlying Mongoose model
+ * @see {@link Media} for the media object structure
+ */
+export async function getMediaById(id: string): Promise<Media | null> {
+  const result = await MediaModel.findOne({ _id: id }).exec();
+  return result ? result : null;
+}
+
+/**
+ * Deletes a media item by its unique identifier
+ * @async
+ * @param {string} id - The MongoDB ObjectId of the media item to delete
+ * @returns {Promise<Media | null>} A promise that resolves to:
+ * - The deleted Media object if found and removed
+ * - null if no media matched the provided ID
+ * @throws {CastError} If the provided ID is not a valid MongoDB ObjectId
+ * @throws {MongoError} If there's a database operation error
+ * @example
+ * // Example of deletion
+ * const deletedMedia = await deleteMediaById('507f1f77bcf86cd799439011');
+ * if (deletedMedia) {
+ *   console.log('Deleted media:', deletedMedia.name);
+ * } else {
+ *   console.log('Media not found or already deleted');
+ * }
+ * 
+ * @see {@link MediaModel} for the underlying Mongoose model
+ * @see {@link getMediaById} for the related retrieval function
+ */
+export async function deleteMediaById(id: string): Promise<Media | null> {
+  const result = await MediaModel.findOneAndDelete({ _id: id }).exec();
+  return result ? result : null;
+}
