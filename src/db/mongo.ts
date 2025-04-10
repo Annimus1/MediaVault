@@ -308,8 +308,10 @@ export async function saveMedia(media: Media): Promise<void> {
  * @see {@link Media} for the media object structure
  */
 export async function getMediaById(id: string): Promise<Media | null> {
-  const result = await MediaModel.findOne({ _id: id }).exec();
-  return result ? result : null;
+  const result  = await MediaModel.findOne({ _id: id })
+  .select('owner name completedDate score poster mediaType language comment')
+  .exec();
+  return result ? result as unknown as Media : null;
 }
 
 /**
@@ -334,6 +336,9 @@ export async function getMediaById(id: string): Promise<Media | null> {
  * @see {@link getMediaById} for the related retrieval function
  */
 export async function deleteMediaById(id: string): Promise<Media | null> {
-  const result = await MediaModel.findOneAndDelete({ _id: id }).exec();
-  return result ? result : null;
+  const result = await MediaModel.findOneAndDelete({ _id: id })
+  .select('owner name completedDate score poster mediaType language comment')
+  .exec();
+  
+  return result ? result as unknown as Media : null;
 }
