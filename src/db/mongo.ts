@@ -10,6 +10,9 @@ export const dbConnection = async () => await mongoose.connect(connectionString!
   .then(() => console.log("Database connected"))
   .catch((_error: Error) => console.log('Unable to connect database.'));
 
+export const closeDB = async () => { 
+  await mongoose.connection.close(); 
+};
 
 // ### USER FUNCTIONS
 
