@@ -104,7 +104,7 @@ describe('Authentication Endpoints - /api/v1/auth', () => {
       expect(response.status).toBe(400);
     });
 
-    it('should return token on login successfuly', async () => {
+    it('should return token on login successfully', async () => {
     const credentials = { password: 'test', user: "test@gmail.com" };
     const response = await request(app)
         .post(`${url}/login`)
