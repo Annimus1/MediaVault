@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import authMiddleware from '../utils/AuthMiddleware.js';
-import { getUserInfo } from '../utils/tokens.js';
-import { deleteMediaById, getMedia, getMediaById, saveMedia } from '../db/mongo.js';
-import { parseMedia } from '../utils/parser.js';
-import { filteredMedia } from '../utils/filterMedia.js';
+import authMiddleware from '../../utils/AuthMiddleware.js';
+import { getUserInfo } from '../../utils/tokens.js';
+import { deleteMediaById, getMedia, getMediaById, saveMedia } from '../../db/mongo.js';
+import { parseMedia } from '../../utils/parser.js';
+import { filteredMedia } from '../../utils/filterMedia.js';
 
 const router = Router();
 

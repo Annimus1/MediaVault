@@ -27,8 +27,6 @@ describe("Media Endpoints -> /api/v1/", () => {
   });
 
   afterAll(async () => {
-    //Delete Media Created on Tests
-
     //Delete Test User
     const query2 = UserSchema.deleteMany({ user: "test" });
     await query2.exec();
@@ -246,5 +244,5 @@ describe("Media Endpoints -> /api/v1/", () => {
       expect(response.status).toBe(200);
     });
   });
-  
+
 });

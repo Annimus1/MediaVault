@@ -14,7 +14,7 @@ describe('Authentication Endpoints - /api/v1/auth', () => {
 
   // close the connection to the database after all tests
   afterAll(async () => {
-    const query = UserSchema.deleteMany({user: "test"});
+    const query = UserSchema.deleteMany({user: "test 2"});
     await query.exec();
 
     const query2 = AuthTokenModel.deleteMany({});
@@ -59,7 +59,7 @@ describe('Authentication Endpoints - /api/v1/auth', () => {
     });
 
     it('should return token if user created successfully.', async () => {
-      const credentials = { password: 'test', user: "test", email: "test@gmail.com" };
+      const credentials = { password: 'test 2', user: "test", email: "test@gmail.com" };
 
       const response = await request(app)
         .post(`${url}/register`)
@@ -71,7 +71,7 @@ describe('Authentication Endpoints - /api/v1/auth', () => {
     });
 
     it('should return code 403 if user already exists.', async () => {
-      const credentials = { password: 'test', user: "test", email: "test@gmail.com" };
+      const credentials = { password: 'test 2', user: "test", email: "test@gmail.com" };
 
       const response = await request(app)
         .post(`${url}/register`)
@@ -105,7 +105,7 @@ describe('Authentication Endpoints - /api/v1/auth', () => {
     });
 
     it('should return token on login successfully', async () => {
-    const credentials = { password: 'test', user: "test@gmail.com" };
+    const credentials = { password: 'test 2', user: "test@gmail.com" };
     const response = await request(app)
         .post(`${url}/login`)
         .send(credentials)

@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { User, UserLogin } from "../utils/types.js";
-import { parseLogin, parseUser } from "../utils/parser.js";
+import { User, UserLogin } from "../../utils/types.js";
+import { parseLogin, parseUser } from "../../utils/parser.js";
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
 import 'dotenv/config'
-import { createUser, getUser, ownerHasToken, revokeToken, saveToken, userExists } from "../db/mongo.js";
+import { createUser, getUser, ownerHasToken, revokeToken, saveToken, userExists } from "../../db/mongo.js";
 
 const router = Router();
 
