@@ -176,6 +176,61 @@ describe("Media Endpoints -> /api/v1/", () => {
 
       expect(response.status).toBe(201);
     });
+
+    it('should return code 201 when Media is created successfully by sending a list of media.', async () => {
+      const media = [
+        {
+        "name": "Test 6",
+        "completedDate": "2023-07-20",
+        "score": 7.2,
+        "comment": "test 6",
+        "poster": "https://test/",
+        "mediaType": "Anime",
+        "language": "Sub-Spanish"
+      },{
+        "name": "Test 7",
+        "completedDate": "2023-07-19",
+        "score": 7.2,
+        "comment": "test 6",
+        "poster": "https://test/",
+        "mediaType": "Anime",
+        "language": "Sub-Spanish"
+      },{
+        "name": "Test 8",
+        "completedDate": "2023-07-18",
+        "score": 7.2,
+        "comment": "test 6",
+        "poster": "https://test/",
+        "mediaType": "Anime",
+        "language": "Sub-Spanish"
+      },{
+        "name": "Test 9",
+        "completedDate": "2023-07-21",
+        "score": 7.2,
+        "comment": "test 6",
+        "poster": "https://test/",
+        "mediaType": "Anime",
+        "language": "Sub-Spanish"
+      },{
+        "name": "Test 10",
+        "completedDate": "2023-07-22",
+        "score": 7.2,
+        "comment": "test 6",
+        "poster": "https://test/",
+        "mediaType": "Anime",
+        "language": "Sub-Spanish"
+      }];
+
+      const response = await request(app)
+        .post(`${url}addMedia/?many=true`)
+        .send(media)
+        .set('Accept', 'application/json')
+        .set('Authorization', `Bearer ${token}`);
+
+
+      expect(response.status).toBe(201);
+    });
+
   });
 
   describe("Lists Media items", () => {
@@ -195,13 +250,14 @@ describe("Media Endpoints -> /api/v1/", () => {
         .set('Accept', 'application/json')
         .set('Authorization', `Bearer ${token}`);
 
-      mediaId = response.body[0]?._id;
+      mediaId = response.body.data[0]?._id;
 
       expect(response.status).toBe(200);
-      expect(response.body).toBeInstanceOf(Array);
-      expect(response.body.length).toBeGreaterThan(0);
+      expect(response.body).toBeInstanceOf(Object);
+      expect(response.body.data).toBeInstanceOf(Array);
+      expect(response.body.data.length).toBeGreaterThan(0);
+      expect(response.body.page).toHaveProperty('currentPage');
     });
-
   });
 
   describe("Get Media by ID", () => {

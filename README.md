@@ -1,12 +1,15 @@
 # MediaVault
 
-MediaVault is a personal API for managing and recording completed movies, series, anime, books, and video games. Allows you to categorize, rate, and track your entertainment consumption yearly. This project uses Node.js, Express, and MongoDB Atlas as the backend.
+MediaVault is a personal API for managing and recording completed movies, series, anime, books, and video games. It allows you to categorize, rate, and track your entertainment consumption yearly. This project uses Node.js, Express, and MongoDB Atlas as the backend.
+
+---
 
 ## Features
 
 - Connection to MongoDB Atlas for data storage.
-- Use of Json Web Tokens (JWT).
+- Use of JSON Web Tokens (JWT) for authentication.
 - RESTful API for interacting with data.
+- Pagination and filtering for retrieving large datasets.
 
 ---
 
@@ -24,41 +27,41 @@ Before you begin, make sure you have installed:
 
 1. Clone this repository:
 
-```bash
-git clone https://github.com/Annimus1/MediaVault.git
-cd MediaVault
-```
+   ```bash
+   git clone https://github.com/Annimus1/MediaVault.git
+   cd MediaVault
+   ```
 
 2. Install dependencies:
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 3. Configure environment variables:
 
-Create a `.env` file in the project root with the following contents:
+   Create a `.env` file in the project root with the following contents:
 
-```properties
-SECRET_KEY=your_secret_key
-CONNECTION_STRING=mongodb+srv://user:password@cluster.mongodb.net/?retryWrites=true&w=majority
-```
+   ```properties
+   SECRET_KEY=your_secret_key
+   CONNECTION_STRING=mongodb+srv://user:password@cluster.mongodb.net/?retryWrites=true&w=majority
+   ```
 
-Make sure to replace `username`, `password`, and `cluster.mongodb.net` with the corresponding values ​​for your MongoDB Atlas cluster.
+   Replace `user`, `password`, and `cluster.mongodb.net` with the corresponding values for your MongoDB Atlas cluster.
 
 4. Build the project (if using TypeScript):
 
-```bash
-npm run build
-```
+   ```bash
+   npm run build
+   ```
 
 5. Start the server:
 
-```bash
-npm start
-```
+   ```bash
+   npm start
+   ```
 
-The server will be available at `http://localhost:5000` (or the port configured in the `PORT` environment variable).
+   The server will be available at `http://localhost:5000` (or the port configured in the `PORT` environment variable).
 
 ---
 
@@ -66,15 +69,24 @@ The server will be available at `http://localhost:5000` (or the port configured 
 
 ### **Base URL:** `http://localhost:5000/api/v1`
 
+---
+
 ### **1. Get all items**
 - **Endpoint:** `/`
 - **Method:** `GET`
-- **Description:** Returns a list of all stored items.
+- **Description:** Returns a list of all stored items with support for pagination and filtering.
+- **Query Parameters:**
+  - `page` (optional): Page number (default: 1).
+  - `mediaType` (optional): Filter by media type (e.g., "Movie", "Anime").
+  - `language` (optional): Filter by language (e.g., "English", "Spanish").
+  - `score` (optional): Filter by minimum score (e.g., `score=8`).
+  - `from` (optional): Filter by start date (e.g., `from=2023-01-01`).
+  - `to` (optional): Filter by end date (e.g., `to=2023-12-31`).
 - **Response codes:**
-- `200 OK`: List of items returned successfully.
-- `500 Internal Server Error`: Error on the server.
+  - `200 OK`: List of items returned successfully.
+  - `500 Internal Server Error`: Server error.
 
-#### Usage example:
+#### Example usage:
 ```bash
 curl -X GET http://localhost:5000/api/v1/
 ```
@@ -85,27 +97,31 @@ curl -X GET http://localhost:5000/api/v1/
 - **Endpoint:** `/addMedia`
 - **Method:** `POST`
 - **Description:** Creates a new item in the database.
+- **Body Parameters:**
+  - `name` (string, required): Name of the item.
+  - `completedDate` (string, required): Completion date.
+  - `score` (number, required): Rating of the item.
+  - `poster` (string, required): URL of the poster.
+  - `mediaType` (string, required): Type of media (e.g., "Movie", "Anime").
+  - `language` (string, required): Language of the media.
+  - `comment` (string, optional): Additional comment.
 - **Response codes:**
-- `201 Created`: Item created successfully.
-- `400 Bad Request`: Invalid data sent.
-- `500 Internal Server Error`: Server error.
+  - `201 Created`: Item created successfully.
+  - `400 Bad Request`: Invalid data sent.
+  - `500 Internal Server Error`: Server error.
 
-#### Usage example:
+#### Example usage:
 ```bash
-curl  -X POST \
-  'http://localhost:5000/api/v1/addMedia/' \
-  --header 'Accept: */*' \
-  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
-  --header 'Authorization: Bearer Json-Web-Token' \
-  --header 'Content-Type: application/json' \
-  --data-raw '{
-  "name": "Test",
+curl -X POST "http://localhost:5000/api/v1/addMedia" \
+-H "Content-Type: application/json" \
+-d '{
+  "name": "Inception",
   "completedDate": "2023-08-20",
-  "score": 7.2,
-  "comment": "test 6",
-  "poster": "https://test/",
-  "mediaType": "Anime",
-  "language": "Sub-Spanish"
+  "score": 9.5,
+  "poster": "https://example.com/poster.jpg",
+  "mediaType": "Movie",
+  "language": "English",
+  "comment": "Amazing movie!"
 }'
 ```
 
@@ -116,37 +132,39 @@ curl  -X POST \
 - **Method:** `GET`
 - **Description:** Returns a specific item by its ID.
 - **Response codes:**
-- `200 OK`: Item returned successfully.
-- `404 Not Found`: Item not found.
-- `500 Internal Server Error`: Server error.
+  - `200 OK`: Item returned successfully.
+  - `404 Not Found`: Item not found.
+  - `500 Internal Server Error`: Server error.
 
-#### Usage example:
+#### Example usage:
 ```bash
-curl  -X GET \
-  'http://localhost:5000/api/v1/id' \
-  --header 'Accept: */*' \
-  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
-  --header 'Authorization: Bearer Token'
+curl -X GET "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123"
 ```
 
 ---
 
-### **5. Delete an item**
+### **4. Delete an item**
 - **Endpoint:** `/:id`
 - **Method:** `DELETE`
 - **Description:** Deletes an item by its ID.
 - **Response codes:**
-- `200 OK`: Item successfully deleted.
-- `404 Not Found`: Item not found.
-- `500 Internal Server Error`: Server error.
+  - `200 OK`: Item successfully deleted.
+  - `404 Not Found`: Item not found.
+  - `500 Internal Server Error`: Server error.
 
-#### Usage example:
+#### Example usage:
 ```bash
-curl  -X DELETE \
-  'http://localhost:5000/api/v1/id' \
-  --header 'Accept: */*' \
-  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
-  --header 'Authorization: Bearer Token'
+curl -X DELETE "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123"
+```
+
+---
+
+## Authentication
+
+Some endpoints require a JWT token for authentication. Make sure to include the `Authorization` header with the format:
+
+```
+Authorization: Bearer <your_token>
 ```
 
 ---
@@ -154,3 +172,9 @@ curl  -X DELETE \
 ## Contributions
 
 Contributions are welcome! If you'd like to contribute, please open an issue or submit a pull request.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
