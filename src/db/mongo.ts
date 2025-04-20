@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Media, User } from '../utils/types.js';
+import { Media, responseMedia, User } from '../utils/types.js';
 import { UserSchema } from './Models/User.js';
 import { AuthTokenModel } from './Models/Auth.js';
 import { MediaModel } from './Models/Media.js';
@@ -10,8 +10,8 @@ export const dbConnection = async () => await mongoose.connect(connectionString!
   .then(() => console.log("Database connected"))
   .catch((_error: Error) => console.log('Unable to connect database.'));
 
-export const closeDB = async () => { 
-  await mongoose.connection.close(); 
+export const closeDB = async () => {
+  await mongoose.connection.close();
 };
 
 // ### USER FUNCTIONS
@@ -237,15 +237,30 @@ export async function getToken(token: string): Promise<any> {
  * @returns {Promise<Media[]>} Array of Media objects without Mongoose metadata
  * @throws {Error} If there's a database error
  */
-export async function getMedia(userId: string, skip: number = 0): Promise<Media[]> {
-  const result = await MediaModel.find({owner: userId })
+export async function getMedia(userId: string, skip: number = 0): Promise<responseMedia> {
+  const limit = 10; // Number of items per page
+  const totalItems = await MediaModel.countDocuments({ owner: userId }).exec();
+  let totalPages = Math.ceil(totalItems / limit);
+
+  const result = await MediaModel.find({ owner: userId })
     .select('owner name completedDate score poster mediaType language comment')
-    .limit(10)
-    .skip(skip)
+    .limit(limit)
+    .skip((skip > 0 ? skip - 1 : 0) * limit)
     .lean()
     .exec();
-  
-  return result as unknown as Media[];
+
+  const mock: responseMedia = {
+    results: {
+      page: {
+        totalPages,
+        currentPage: skip,
+        nextPage: skip + 1,
+        prevPage: skip > 0 ? skip - 1 : 0
+      },
+      data: result as unknown as Media[] | null
+    }
+  };
+  return mock;
 }
 
 /**
@@ -311,9 +326,9 @@ export async function saveMedia(media: Media): Promise<void> {
  * @see {@link Media} for the media object structure
  */
 export async function getMediaById(id: string): Promise<Media | null> {
-  const result  = await MediaModel.findOne({ _id: id })
-  .select('owner name completedDate score poster mediaType language comment')
-  .exec();
+  const result = await MediaModel.findOne({ _id: id })
+    .select('owner name completedDate score poster mediaType language comment')
+    .exec();
   return result ? result as unknown as Media : null;
 }
 
@@ -340,8 +355,8 @@ export async function getMediaById(id: string): Promise<Media | null> {
  */
 export async function deleteMediaById(id: string): Promise<Media | null> {
   const result = await MediaModel.findOneAndDelete({ _id: id })
-  .select('owner name completedDate score poster mediaType language comment')
-  .exec();
-  
+    .select('owner name completedDate score poster mediaType language comment')
+    .exec();
+
   return result ? result as unknown as Media : null;
 }

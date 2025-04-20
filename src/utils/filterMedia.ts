@@ -8,8 +8,11 @@ import { Media } from "./types.js";
  * @returns {Media[] | null} Filtered results or null if no filters applied
  * @throws {TypeError} If any filter value is invalid
  */
-export function filteredMedia(prevResults: Media[], queryParams: any): Media[] | null {
+export function filteredMedia(prevResults: Media[]| null, queryParams: any): Media[] | null {
   if (!hasFilters(queryParams)) {
+    return null;
+  }
+  if (!prevResults) {
     return null;
   }
 

@@ -1,9 +1,9 @@
 import { Language, mediaType } from "./enums.js"
 
 export type User = {
-    user: string,
-    email: string,
-    password: string
+  user: string,
+  email: string,
+  password: string
 }
 
 export type UserLogin = {
@@ -11,18 +11,30 @@ export type UserLogin = {
   password: string
 }
 
+export interface responseMedia {
+  results: {
+    page: {
+      totalPages: number,
+      currentPage: number,
+      nextPage: number,
+      prevPage: number
+    },
+    data: Media[] | null
+  }
+}
 export type UserDTO = Omit<User, password, email>
 
 export interface Media {
-    owner: string,
-    name: string,
-    completedDate: Date,
-    score: Number,
-    comment?: string,
-    poster: string,
-    mediaType: mediaType,
-    language: Language,
+  owner: string;
+  name: string;
+  completedDate: string;
+  score: number;
+  poster: string;
+  mediaType: string;
+  language: string;
+  comment?: string;
 }
+
 export type MediaSchema = Omit<Media, id>
 
 export interface IAuthToken extends Document {
@@ -32,7 +44,7 @@ export interface IAuthToken extends Document {
   expiresAt: Date;        // Fecha de expiración
 }
 
-export interface Token{
+export interface Token {
   "user": {
     "user": string,
     "id": string
