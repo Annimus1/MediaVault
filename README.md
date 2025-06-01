@@ -67,9 +67,90 @@ Before you begin, make sure you have installed:
 
 ## API Endpoints
 
-### **Base URL:** `http://localhost:5000/api/v1`
+### **Host and url info**
+
+**dev host: http://localhost:500**
+
+**production host: https://mediavault-0ucb.onrender.com**
+
+### **Base URL:** `{host}/api/v1`
 
 ---
+
+### Login
+
+### **1. Login**
+- **Endpoint:** `/auth/login`
+- **Method:** `post`
+- **Description:** Connect a user through user and password. 
+- **Query Parameters:**
+  - `user` (**required**): Email or Username on the application.
+  - `password` (**required**): password on the application.
+- **Response codes:**
+  - `200 OK`: Agent logged in successfuly.
+  - `400 Bad Request`: Any parameter is missing.
+  - `401 Unauthorized`: Wrong 'user' or 'password'.
+  - `500 Internal Server Error`: Server error.
+- **Response Example:**
+  ```json
+  {
+    "status": 200,
+    "data": {
+      "token": "slkdanasnoackammlmdad$a%sdllkm"
+    }
+  }
+  ```
+#### Example usage:
+```bash
+curl -X POST "http://localhost:5000/api/v1/auth/login" \
+-H "Content-Type: application/json" \
+-d '{
+  "user": "test@gmail.com",
+  "password": "1234"
+}'
+```
+
+---
+
+### Register
+
+### **1. Register**
+- **Endpoint:** `/auth/register`
+- **Method:** `post`
+- **Description:** create an account for a user based on nickname, password and email. 
+- **Query Parameters:**
+  - `user` (**required**): Username on the application.
+  - `password` (**required**): password on the application.
+  - `email` (**required**): Email on the application.
+- **Response codes:**
+  - `200 OK`: Agent logged in successfuly.
+  - `400 Bad Request`: Any parameter is missing.
+  - `401 Unauthorized`: Wrong 'user' or 'password'.
+  - `403 Forbidden`: User already exists.
+  - `500 Internal Server Error`: Server error.
+- **Response Example:**
+  ```json
+  {
+    "status": 200,
+    "data": {
+      "token": "slkdanasnoackammlmdad$a%sdllkm"
+    }
+  }
+  ```
+#### Example usage:
+```bash
+curl -X POST "http://localhost:5000/api/v1/auth/register" \
+-H "Content-Type: application/json" \
+-d '{
+  "email": "test@gmail.com",
+  "user: "test",
+  "password": "1234"
+}'
+```
+
+---
+
+### Media
 
 ### **1. Get all items**
 - **Endpoint:** `/`
