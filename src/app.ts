@@ -9,7 +9,8 @@ const app = express();
 app.use(cors({
     origin: 'https://media-vault-ui.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
 }));
 
 app.use(express.json());
