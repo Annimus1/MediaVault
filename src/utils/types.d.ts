@@ -15,6 +15,7 @@ export interface responseMedia {
   results: {
     page: {
       totalPages: number,
+      totalItems: number,
       currentPage: number,
       nextPage: number,
       prevPage: number

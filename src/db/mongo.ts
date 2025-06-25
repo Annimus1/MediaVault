@@ -237,15 +237,13 @@ export async function getToken(token: string): Promise<any> {
  * @returns {Promise<Media[]>} Array of Media objects without Mongoose metadata
  * @throws {Error} If there's a database error
  */
-export async function getMedia(userId: string, skip: number = 0): Promise<responseMedia> {
+export async function getMedia(userId: string, skip: number = 1): Promise<responseMedia> {
   const limit = 10; // Number of items per page
   const totalItems = await MediaModel.countDocuments({ owner: userId }).exec();
-  let totalPages = Math.ceil(totalItems / limit);
+  let totalPages = Math.ceil(totalItems / limit); 
 
   const result = await MediaModel.find({ owner: userId })
     .select('owner name completedDate score poster mediaType language comment')
-    .limit(limit)
-    .skip((skip > 0 ? skip - 1 : 0) * limit)
     .lean()
     .exec();
 
@@ -253,9 +251,10 @@ export async function getMedia(userId: string, skip: number = 0): Promise<respon
     results: {
       page: {
         totalPages,
+        totalItems : result.length,
         currentPage: skip,
         nextPage: skip + 1,
-        prevPage: skip > 0 ? skip - 1 : 0
+        prevPage: skip > 1 ? skip - 1 : 1
       },
       data: result as unknown as Media[] | null
     }

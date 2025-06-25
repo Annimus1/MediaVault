@@ -237,3 +237,30 @@ export function parseMedia(media: any, owner: string): Media {
     throw new TypeError("Missing required properties. Needed: name, completedDate, score, poster, mediaType, language, comment");
   }
 }
+
+/**
+ * Returns a paginated slice of the given array based on the current page and limit.
+ *
+ * @function LimitElements
+ * @param {Media[]} wholeArray - The complete array of Media objects to paginate.
+ * @param {number} [currentPage=1] - The current page number (1-based).
+ * @param {number} [limit=10] - The maximum number of elements per page.
+ * @returns {Media[]} A subarray containing up to `limit` elements for the requested page.
+ *
+ * @example
+ * // Returns elements 0-9 (first page)
+ * LimitElements(mediaArray);
+ *
+ * @example
+ * // Returns elements 10-20 (second page)
+ * LimitElements(mediaArray, 2);
+ */
+export function LimitElements(wholeArray: Media[], currentPage: number = 1, limit: number = 10): Media[] {
+  const startSlice = currentPage > 1 ? (currentPage - 1) * limit : 0;
+  const endSlice = startSlice + limit;
+
+  console.log(`page: ${currentPage} -> from ${startSlice} to ${endSlice}`);
+
+  const resultList = wholeArray.slice(startSlice, endSlice);
+  return resultList;
+}
