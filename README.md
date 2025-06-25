@@ -169,7 +169,18 @@ curl -X POST "http://localhost:5000/api/v1/auth/register" \
 
 #### Example usage:
 ```bash
-curl -X GET http://localhost:5000/api/v1/
+curl -X GET http://localhost:5000/api/v1/ \
+  -H "Application-Authorization: TOKEN"
+```
+
+```bash
+curl -X GET http://localhost:5000/api/v1/?page=2 \
+  -H "Application-Authorization: TOKEN"
+```
+
+```bash
+curl -X GET http://localhost:5000/api/v1/?mediaType=movies& \
+  -H "Application-Authorization: TOKEN"language=english
 ```
 
 ---
@@ -194,7 +205,8 @@ curl -X GET http://localhost:5000/api/v1/
 #### Example usage:
 ```bash
 curl -X POST "http://localhost:5000/api/v1/addMedia" \
--H "Content-Type: application/json" \
+-H "Content-Type: application/json"  \
+-H "Application-Authorization: TOKEN" \
 -d '{
   "name": "Inception",
   "completedDate": "2023-08-20",
@@ -205,6 +217,53 @@ curl -X POST "http://localhost:5000/api/v1/addMedia" \
   "comment": "Amazing movie!"
 }'
 ```
+---
+
+### **2.1. Create many new items**
+- **Endpoint:** `/addMedia?many=true`
+- **Method:** `POST`
+- **Description:** Creates new items in the database.
+- **Body Parameters:**
+  - `name` (string, required): Name of the item.
+  - `completedDate` (string, required): Completion date.
+  - `score` (number, required): Rating of the item.
+  - `poster` (string, required): URL of the poster.
+  - `mediaType` (string, required): Type of media (e.g., "Movie", "Anime").
+  - `language` (string, required): Language of the media.
+  - `comment` (string, optional): Additional comment.
+- **Response codes:**
+  - `201 Created`: Item created successfully.
+  - `400 Bad Request`: Invalid data sent.
+  - `500 Internal Server Error`: Server error.
+
+#### Example usage:
+```bash
+curl -X POST "http://localhost:5000/api/v1/addMedia?many=true" \
+-H "Content-Type: application/json" \
+-H "Application-Authorization: TOKEN" \
+-d '[
+  {
+  "name": "Inception",
+  "completedDate": "2023-08-20",
+  "score": 9.5,
+  "poster": "https://example.com/poster.jpg",
+  "mediaType": "Movie",
+  "language": "English",
+  "comment": "Amazing movie!"
+},
+{
+  "name": "Now you see me",
+  "completedDate": "2023-04-30",
+  "score": 9.5,
+  "poster": "https://example.com/poster.jpg",
+  "mediaType": "Movie",
+  "language": "English",
+  "comment": "Amazing movie!"
+}
+]'
+```
+http://localhost:5000/api/v1/addMedia?many=true
+
 
 ---
 
@@ -219,7 +278,8 @@ curl -X POST "http://localhost:5000/api/v1/addMedia" \
 
 #### Example usage:
 ```bash
-curl -X GET "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123"
+curl -X GET "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123" \
+-H "Application-Authorization: TOKEN"
 ```
 
 ---
@@ -235,7 +295,8 @@ curl -X GET "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123"
 
 #### Example usage:
 ```bash
-curl -X DELETE "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123"
+curl -X DELETE "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123" \
+-H "Application-Authorization: TOKEN"
 ```
 
 ---
