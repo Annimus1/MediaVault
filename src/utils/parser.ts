@@ -40,6 +40,21 @@ export function parseUser(incomingUser: any): User {
   }
 }
 
+/**
+ * Parses and validates user login input to ensure it matches the UserLogin type requirements.
+ *
+ * @function parseLogin
+ * @param {any} incomingUser - The raw user login object from the request.
+ * @returns {UserLogin} A validated UserLogin object with required properties.
+ * @throws {TypeError} If any required property is missing or invalid.
+ * @example
+ * // Returns valid UserLogin object
+ * parseLogin({ user: 'john_doe', password: 'secure123' });
+ *
+ * @example
+ * // Throws TypeError
+ * parseLogin({ user: 123, password: 'secure123' });
+ */
 export function parseLogin(incomingUser: any): UserLogin {
   if (
     incomingUser.hasOwnProperty('user') &&
@@ -258,8 +273,6 @@ export function parseMedia(media: any, owner: string): Media {
 export function LimitElements(wholeArray: Media[], currentPage: number = 1, limit: number = 10): Media[] {
   const startSlice = currentPage > 1 ? (currentPage - 1) * limit : 0;
   const endSlice = startSlice + limit;
-
-  console.log(`page: ${currentPage} -> from ${startSlice} to ${endSlice}`);
 
   const resultList = wholeArray.slice(startSlice, endSlice);
   return resultList;
