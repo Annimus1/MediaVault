@@ -7,7 +7,7 @@ const app = express();
 
 // Cors config
 app.use(cors({
-    origin: 'https://media-vault-ui.vercel.app',
+    origin: process.env.FRONTEND_URL,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
