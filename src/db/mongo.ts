@@ -359,3 +359,40 @@ export async function deleteMediaById(id: string): Promise<Media | null> {
 
   return result ? result as unknown as Media : null;
 }
+
+/**
+ * Updates a media item in the database by its unique identifier.
+ *
+ * @async
+ * @function updateMedia
+ * @param {Media} incomingMedia - The updated media object. Must conform to the Media interface.
+ * @param {string} id - The MongoDB ObjectId of the media item to update.
+ * @returns {Promise<void>} Resolves when the update operation is complete.
+ * @throws {Error} If there is an error during the update operation.
+ *
+ * @example
+ * // Example usage
+ * const updatedMedia = {
+ *   owner: 'user123',
+ *   name: 'Interstellar',
+ *   completedDate: '2023-06-01',
+ *   score: 9.0,
+ *   poster: 'http://example.com/interstellar.jpg',
+ *   mediaType: 'movie',
+ *   language: 'english',
+ *   comment: 'Amazing visuals!'
+ * };
+ *
+ * try {
+ *   await updateMedia(updatedMedia, '507f1f77bcf86cd799439011');
+ *   console.log('Media updated successfully');
+ * } catch (error) {
+ *   console.error('Failed to update media:', error.message);
+ * }
+ *
+ * @see {@link Media} for the expected media object structure
+ * @see {@link MediaModel} for the underlying Mongoose model
+ */
+export async function updateMedia(incomingMedia: Media, id: string): Promise<void> {
+  await MediaModel.updateOne({ _id: id }, incomingMedia).exec();
+}
