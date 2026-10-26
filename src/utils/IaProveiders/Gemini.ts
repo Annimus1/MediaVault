@@ -46,15 +46,15 @@ export class GeminiProvider implements IProvider {
 
         const response = await this.ai.models.generateContent({
             model: "gemini-3-flash-preview",
-            contents: `Act as an expert movie, series, and book critic and recommendation engine. Your goal is to analyze the user's consumption history and suggest 5 new titles.
+            contents: `Act as an expert movie, series, and book critic and recommendation engine. Your goal is to analyze the user's consumption history and suggest up to 10 new titles.
 
 Strict Rules:
 1. Analyze the 'score' to understand genres and styles preference.
 2. Analyze 'completedDate' to prioritize recent interests.
 3. Maintain a variety of 'mediaTypes', but ensure the majority of recommendations match the user's most-watched categories.
 4. DO NOT recommend titles already present in the user's history.
-5. Fill null for the 'poster' field.
-6. You MUST respond ONLY in valid JSON format.
+5. For book recommendations include a valid ISBN-10 or ISBN-13 in 'isbn'. Use null for every other media type.
+6. Respond ONLY with a valid JSON array. Do not use markdown or add any text outside the array.
 
 Required JSON Structure:
 [
@@ -63,7 +63,7 @@ Required JSON Structure:
     "mediaType": "movie | serie | anime | book",
     "reason": "A one-sentence explanation of why the user will like it based on their history.",
     "matchPercentage": 95,
-    "poster": "Direct link to the image poster"
+    "isbn": "ISBN-10 or ISBN-13 for books, otherwise null"
   }
 ]
   User History:

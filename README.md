@@ -45,9 +45,11 @@ Before you begin, make sure you have installed:
    ```properties
    SECRET_KEY=your_secret_key
    CONNECTION_STRING=mongodb+srv://user:password@cluster.mongodb.net/?retryWrites=true&w=majority
+   GEMINI_API_KEY=your_gemini_api_key
+   FRONTEND_URL=http://localhost:3000
    ```
 
-   Replace `user`, `password`, and `cluster.mongodb.net` with the corresponding values for your MongoDB Atlas cluster.
+   Replace `user`, `password`, and `cluster.mongodb.net` with the corresponding values for your MongoDB Atlas cluster. `GEMINI_API_KEY` is required for recommendations and `FRONTEND_URL` configures CORS.
 
 4. Build the project (if using TypeScript):
 
@@ -170,17 +172,17 @@ curl -X POST "http://localhost:5000/api/v1/auth/register" \
 #### Example usage:
 ```bash
 curl -X GET http://localhost:5000/api/v1/ \
-  -H "Application-Authorization: TOKEN"
+  -H "Authorization: Bearer TOKEN"
 ```
 
 ```bash
 curl -X GET http://localhost:5000/api/v1/?page=2 \
-  -H "Application-Authorization: TOKEN"
+  -H "Authorization: Bearer TOKEN"
 ```
 
 ```bash
 curl -X GET http://localhost:5000/api/v1/?mediaType=movies& \
-  -H "Application-Authorization: TOKEN"language=english
+  -H "Authorization: Bearer TOKEN"language=english
 ```
 
 ---
@@ -206,7 +208,7 @@ curl -X GET http://localhost:5000/api/v1/?mediaType=movies& \
 ```bash
 curl -X POST "http://localhost:5000/api/v1/addMedia" \
 -H "Content-Type: application/json"  \
--H "Application-Authorization: TOKEN" \
+-H "Authorization: Bearer TOKEN" \
 -d '{
   "name": "Inception",
   "completedDate": "2023-08-20",
@@ -240,7 +242,7 @@ curl -X POST "http://localhost:5000/api/v1/addMedia" \
 ```bash
 curl -X POST "http://localhost:5000/api/v1/addMedia?many=true" \
 -H "Content-Type: application/json" \
--H "Application-Authorization: TOKEN" \
+-H "Authorization: Bearer TOKEN" \
 -d '[
   {
   "name": "Inception",
@@ -279,7 +281,7 @@ http://localhost:5000/api/v1/addMedia?many=true
 #### Example usage:
 ```bash
 curl -X GET "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123" \
--H "Application-Authorization: TOKEN"
+-H "Authorization: Bearer TOKEN"
 ```
 
 ---
@@ -296,7 +298,42 @@ curl -X GET "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123" \
 #### Example usage:
 ```bash
 curl -X DELETE "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123" \
--H "Application-Authorization: TOKEN"
+-H "Authorization: Bearer TOKEN"
+```
+
+---
+
+### **5. Get personalized recommendations**
+- **Endpoint:** `/recommendations`
+- **Method:** `GET`
+- **Description:** Uses the authenticated user's media history to generate up to 10 suggestions with Gemini, resolves covers from Rotten Tomatoes or Open Library, discards every recommendation without a verified cover, and returns at most 5.
+- **Authentication:** Required (`Authorization: Bearer <token>`).
+- **Environment:** Requires `GEMINI_API_KEY`.
+- **Books:** Gemini must return a valid ISBN. Books without an ISBN or without an Open Library cover are discarded.
+- **Response codes:**
+  - `200 OK`: Array of recommendations (may be empty if no candidate had a cover).
+  - `400 Bad Request`: The user has no media history yet.
+  - `401 Unauthorized`: Missing or invalid token.
+  - `502 Bad Gateway`: The AI provider failed or returned malformed data.
+  - `500 Internal Server Error`: Server error.
+
+#### Example usage:
+```bash
+curl -X GET "http://localhost:5000/api/v1/recommendations" \
+-H "Authorization: Bearer TOKEN"
+```
+
+#### Response example:
+```json
+[
+  {
+    "name": "Arrival",
+    "mediaType": "movie",
+    "reason": "Matches your preference for thoughtful science fiction.",
+    "matchPercentage": 94,
+    "poster": "https://resizing.flixster.com/example.jpg"
+  }
+]
 ```
 
 ---

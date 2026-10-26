@@ -4,7 +4,7 @@ import { UserSchema } from './Models/User.js';
 import { AuthTokenModel } from './Models/Auth.js';
 import { MediaModel } from './Models/Media.js';
 
-const connectionString = process.env.CONNECTION_STRING || 'mongodb://user:password@localhost:27017/mediavault?authSource=admin';
+const connectionString = process.env.CONNECTION_STRING;
 
 export const dbConnection = async () => await mongoose.connect(connectionString!)
   .then(() => console.log("Database connected"))
@@ -255,6 +255,30 @@ export async function getMedia(userId: string, skip: number = 1): Promise<respon
         currentPage: skip,
         nextPage: skip + 1,
         prevPage: skip > 1 ? skip - 1 : 1
+      },
+      data: result as unknown as Media[] | null
+    }
+  };
+  return mock;
+}
+
+export async function getAllMedia(userId: string): Promise<responseMedia> {
+  // obtiene todos los documentos del usuario sin proyectar campos (todos los datos)
+  const result = await MediaModel.find({ owner: userId })
+    .lean()
+    .exec();
+
+  const totalItems = await MediaModel.countDocuments({ owner: userId }).exec();
+  const totalPages = 1;
+
+  const mock: responseMedia = {
+    results: {
+      page: {
+        totalPages,
+        totalItems,
+        currentPage: 1,
+        nextPage: 1,
+        prevPage: 1
       },
       data: result as unknown as Media[] | null
     }
