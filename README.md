@@ -17,7 +17,7 @@ MediaVault is a personal API for managing and recording completed movies, series
 
 Before you begin, make sure you have installed:
 
-- [Node.js](https://nodejs.org/) (version 16 or higher)
+- [Node.js](https://nodejs.org/) (version 20 or higher)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 - A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) account
 
@@ -181,8 +181,8 @@ curl -X GET http://localhost:5000/api/v1/?page=2 \
 ```
 
 ```bash
-curl -X GET http://localhost:5000/api/v1/?mediaType=movies& \
-  -H "Authorization: Bearer TOKEN"language=english
+curl -X GET "http://localhost:5000/api/v1/?mediaType=movie&language=english" \
+  -H "Authorization: Bearer TOKEN"
 ```
 
 ---
@@ -332,6 +332,14 @@ curl -X GET "http://localhost:5000/api/v1/recommendations" \
     "reason": "Matches your preference for thoughtful science fiction.",
     "matchPercentage": 94,
     "poster": "https://resizing.flixster.com/example.jpg"
+  },
+  {
+    "name": "Dune",
+    "mediaType": "book",
+    "reason": "Classic science fiction that matches your highest scores.",
+    "matchPercentage": 88,
+    "isbn": "9780441172719",
+    "poster": "https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg?default=false"
   }
 ]
 ```

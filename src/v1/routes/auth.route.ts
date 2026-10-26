@@ -3,7 +3,6 @@ import { User, UserLogin } from "../../utils/types.js";
 import { parseLogin, parseUser } from "../../utils/parser.js";
 import bcrypt from 'bcrypt';
 import jwt from "jsonwebtoken";
-import 'dotenv/config'
 import { createUser, getUser, ownerHasToken, revokeToken, saveToken, userExists } from "../../db/mongo.js";
 
 const router = Router();
@@ -42,7 +41,7 @@ router.post("/login", async (req, res) => {
       await revokeToken(userDB._id.toString());
       await saveToken(userDB._id.toString(), token)
     }else{
-      saveToken(userDB._id.toString(), token);
+      await saveToken(userDB._id.toString(), token);
     }
 
     res.send({ token: token });
@@ -72,14 +71,14 @@ router.post("/register", async (req, res) => {
 
       // save user in database
       createUser(incomingUser)
-        .then(user => {
-          console.log('User created:', user);
-     
+        .then(async user => {
+          console.log('User created:', user.user);
+
         // create jwt
         const token = jwt.sign( {user : { user: incomingUser.user, id: user._id.toString()}},  secretKey!, { expiresIn: '1d' })
 
          // add token into db
-          saveToken(user._id.toString(), token);
+          await saveToken(user._id.toString(), token);
           res.status(201).send({ token: token })
         })
         .catch(err => {

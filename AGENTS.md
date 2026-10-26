@@ -15,8 +15,9 @@ Personal media-tracking API: Node/Express + Mongoose, TypeScript ESM. No fronten
 
 Required in `.env` (gitignored): `SECRET_KEY`, `CONNECTION_STRING`. `GEMINI_API_KEY` for recommendations, `FRONTEND_URL` for CORS.
 
-- `dotenv` is loaded only as a side effect of importing `src/app.ts` (via `auth.route.ts`'s `import 'dotenv/config'`).
-- `src/db/mongo.ts` reads `CONNECTION_STRING` at module load. Import `app` (or `dotenv/config`) **before** `db/mongo` in entrypoints and tests. `src/index.ts` does this correctly.
+- `dotenv/config` is imported explicitly at the top of `src/index.ts`, `src/app.ts`, and `src/db/mongo.ts`, so `.env` loads regardless of import order.
+- `src/db/mongo.ts` reads `CONNECTION_STRING` at module load.
+- `GEMINI_API_KEY` is read lazily on the first recommendation request; a missing key no longer crashes startup, but `/recommendations` returns 502 until it is set.
 - Tests use the real database and clean up their own users/tokens; never point them at production data.
 
 ## ESM import rule

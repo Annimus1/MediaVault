@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { getToken } from "../db/mongo.js";
-import { Token } from "./types";
+import { Token } from "./types.js";
 
 /**
  * Verifies if a JWT token is cryptographically valid

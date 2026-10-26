@@ -1,5 +1,5 @@
-import { Media } from "../types";
-import { IProvider } from "./Iprovider";
+import { Media } from "../types.js";
+import { IProvider } from "./Iprovider.js";
 import { GoogleGenAI } from "@google/genai";
 
 /**
@@ -18,10 +18,19 @@ import { GoogleGenAI } from "@google/genai";
 
 export class GeminiProvider implements IProvider {
 
-    private ai;
+    private ai: GoogleGenAI | null = null;
 
-    constructor() {
-        this.ai = new GoogleGenAI({});
+    private getClient(): GoogleGenAI {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            throw new Error('GEMINI_API_KEY is not defined.');
+        }
+
+        if (!this.ai) {
+            this.ai = new GoogleGenAI({ apiKey });
+        }
+
+        return this.ai;
     }
 
     /**
@@ -44,7 +53,7 @@ export class GeminiProvider implements IProvider {
             userHistory.push({ name: m.name, mediaType: m.mediaType, completeDate: m.completedDate, score: m.score });
         });
 
-        const response = await this.ai.models.generateContent({
+        const response = await this.getClient().models.generateContent({
             model: "gemini-3-flash-preview",
             contents: `Act as an expert movie, series, and book critic and recommendation engine. Your goal is to analyze the user's consumption history and suggest up to 10 new titles.
 

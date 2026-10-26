@@ -40,16 +40,6 @@ async function register(user: typeof emptyUser): Promise<string> {
   return response.body.token as string;
 }
 
-async function waitForToken(token: string): Promise<void> {
-  for (let attempt = 0; attempt < 40; attempt += 1) {
-    const savedToken = await AuthTokenModel.findOne({ token }).exec();
-    if (savedToken) return;
-    await new Promise((resolve) => setTimeout(resolve, 25));
-  }
-
-  throw new Error('Token was not persisted to the database.');
-}
-
 async function cleanUp(): Promise<void> {
   await MediaModel.deleteMany({ name: { $regex: '^Reco Test' } }).exec();
   await UserSchema.deleteMany({ user: { $in: [emptyUser.user, mediaUser.user] } }).exec();
@@ -63,9 +53,6 @@ describe('Recommendations Endpoint -> /api/v1/recommendations', () => {
 
     emptyToken = await register(emptyUser);
     mediaToken = await register(mediaUser);
-
-    await waitForToken(emptyToken);
-    await waitForToken(mediaToken);
   });
 
   afterAll(async () => {

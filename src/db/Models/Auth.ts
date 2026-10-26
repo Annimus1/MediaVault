@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IAuthToken } from '../../utils/types';
+import { IAuthToken } from '../../utils/types.js';
 
 
 // Define Mongoose schema

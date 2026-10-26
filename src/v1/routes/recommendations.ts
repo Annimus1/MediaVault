@@ -8,9 +8,7 @@ import { parseRecommendations } from '../../utils/recommendations.js';
 
 const router = Router();
 
-router.use(authMiddleware);
-
-router.get('/recommendations', async (req, res) => {
+router.get('/recommendations', authMiddleware, async (req, res) => {
   try {
     const secretKey = process.env.SECRET_KEY;
     if (!secretKey) {

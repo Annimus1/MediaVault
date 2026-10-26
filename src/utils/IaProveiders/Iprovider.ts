@@ -1,4 +1,4 @@
-import { Media } from "../types";
+import { Media } from "../types.js";
 
 /**
  * Interface representing a provider that can generate media recommendations.

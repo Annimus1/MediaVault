@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import mongoose from 'mongoose';
 import { Media, responseMedia, User } from '../utils/types.js';
 import { UserSchema } from './Models/User.js';

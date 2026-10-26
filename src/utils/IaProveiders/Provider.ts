@@ -1,6 +1,6 @@
-import { Media } from "../types";
-import { GeminiProvider } from "./Gemini";
-import { IProvider } from "./Iprovider";
+import { Media } from "../types.js";
+import { GeminiProvider } from "./Gemini.js";
+import { IProvider } from "./Iprovider.js";
 
 /**
  * Singleton class that manages the AI provider for media recommendations.
