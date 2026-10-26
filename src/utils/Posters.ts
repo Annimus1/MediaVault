@@ -4,6 +4,19 @@ import { Recommendation } from "./types.js";
 
 const REQUEST_TIMEOUT_MS = 8000;
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+const ANILIST_URL = 'https://graphql.anilist.co';
+const ANILIST_ANIME_QUERY = `
+  query ($search: String) {
+    Page(perPage: 1) {
+      media(search: $search, type: ANIME, sort: [POPULARITY_DESC]) {
+        coverImage {
+          extraLarge
+          large
+        }
+      }
+    }
+  }
+`;
 
 export async function getPosters(media: Recommendation[]): Promise<Recommendation[]> {
     const promises = media.map(async (m): Promise<Recommendation> => {
@@ -12,8 +25,13 @@ export async function getPosters(media: Recommendation[]): Promise<Recommendatio
         try {
             if (m.mediaType === "movie") {
                 posterUrl = await fetchPosterFromAPI(m.name, 'm');
-            } else if (m.mediaType === "serie" || m.mediaType === "anime") {
+            } else if (m.mediaType === "serie") {
                 posterUrl = await fetchPosterFromAPI(m.name, 'tv');
+            } else if (m.mediaType === "anime") {
+                posterUrl = await fetchAnimePoster(m.name);
+                if (!posterUrl) {
+                    posterUrl = await fetchPosterFromAPI(m.name, 'tv');
+                }
             } else if (m.mediaType === "book") {
                 posterUrl = await bookPoster(m.isbn);
             }
@@ -48,6 +66,53 @@ async function fetchPosterFromAPI(title: string, mediaType: string): Promise<str
     } catch (error: any) {
         // Si la URL falla (404), Rotten Tomatoes no tiene esa película con ese nombre exacto
         console.error(`Error 404 o red para ${title}:`, url);
+        return null;
+    }
+}
+
+interface AniListMedia {
+    coverImage?: {
+        extraLarge?: string | null;
+        large?: string | null;
+    };
+}
+
+interface AniListResponse {
+    data?: {
+        Page?: {
+            media?: AniListMedia[];
+        };
+    };
+    errors?: Array<{ message?: string }>;
+}
+
+async function fetchAnimePoster(title: string): Promise<string | null> {
+    try {
+        const response = await axios.post<AniListResponse>(
+            ANILIST_URL,
+            {
+                query: ANILIST_ANIME_QUERY,
+                variables: { search: title }
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'User-Agent': USER_AGENT
+                },
+                timeout: REQUEST_TIMEOUT_MS
+            }
+        );
+
+        if (response.data.errors?.length) {
+            console.error(`AniList search failed for ${title}:`, response.data.errors[0]?.message);
+            return null;
+        }
+
+        const cover = response.data.data?.Page?.media?.[0]?.coverImage;
+        return cover?.extraLarge || cover?.large || null;
+    } catch (error) {
+        console.error(`No anime cover found for ${title}`);
         return null;
     }
 }

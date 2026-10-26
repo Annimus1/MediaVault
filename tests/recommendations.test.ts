@@ -105,20 +105,28 @@ describe('Recommendations Endpoint -> /api/v1/recommendations', () => {
       }
     });
 
-    it('returns up to five recommendations that all have a cover.', async () => {
-      const candidates = Array.from({ length: 6 }, (_, index) => ({
-        name: `Reco ${index}`,
-        mediaType: index === 0 ? 'book' : 'movie',
-        reason: 'Fits the user history.',
-        matchPercentage: 90,
-        ...(index === 0 ? { isbn: '9780140328721' } : {})
-      }));
+    it('returns up to six recommendations per media type (24 total).', async () => {
+      const mediaTypes = ['movie', 'serie', 'anime', 'book'];
+      const candidates = mediaTypes.flatMap((mediaType) =>
+        Array.from({ length: 8 }, (_, index) => ({
+          name: `Reco ${mediaType} ${index}`,
+          mediaType,
+          reason: 'Fits the user history.',
+          matchPercentage: 90
+        }))
+      );
+      candidates.push({
+        name: 'Reco game',
+        mediaType: 'videogame',
+        reason: 'Unsupported category.',
+        matchPercentage: 90
+      });
 
       mockedGetRecommendation.mockResolvedValue(JSON.stringify(candidates));
       mockedGetPosters.mockImplementation(async (items) =>
-        items.map((item, index) => ({
+        items.map((item) => ({
           ...item,
-          poster: index < 5 ? `https://covers.example/${index}.jpg` : null
+          poster: `https://covers.example/${item.name}.jpg`
         }))
       );
 
@@ -127,26 +135,17 @@ describe('Recommendations Endpoint -> /api/v1/recommendations', () => {
         .set('Authorization', `Bearer ${mediaToken}`);
 
       expect(response.status).toBe(200);
-      expect(response.body).toHaveLength(5);
-      expect(response.body.map((item: any) => item.name)).toEqual([
-        'Reco 0',
-        'Reco 1',
-        'Reco 2',
-        'Reco 3',
-        'Reco 4'
-      ]);
+      expect(response.body).toHaveLength(24);
+      expect(
+        response.body.reduce((counts: Record<string, number>, item: any) => {
+          counts[item.mediaType] = (counts[item.mediaType] ?? 0) + 1;
+          return counts;
+        }, {})
+      ).toEqual({ movie: 6, serie: 6, anime: 6, book: 6 });
       expect(response.body.every((item: any) => typeof item.poster === 'string')).toBe(true);
+      expect(response.body.some((item: any) => item.mediaType === 'videogame')).toBe(false);
       expect(mockedGetPosters).toHaveBeenCalledTimes(1);
-
-      const posterInput = mockedGetPosters.mock.calls[0][0];
-      expect(posterInput).toHaveLength(6);
-      expect(posterInput[0]).toEqual(
-        expect.objectContaining({
-          name: 'Reco 0',
-          mediaType: 'book',
-          isbn: '9780140328721'
-        })
-      );
+      expect(mockedGetPosters.mock.calls[0][0]).toHaveLength(33);
     });
 
     it('returns an empty list when no recommendation has a cover.', async () => {

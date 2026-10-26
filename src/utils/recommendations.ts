@@ -3,6 +3,14 @@ import { Recommendation } from './types.js';
 
 const VALID_MEDIA_TYPES = new Set<string>(Object.values(MediaType));
 
+export const MAX_RECOMMENDATIONS_PER_TYPE = 6;
+export const MAX_RECOMMENDATION_CANDIDATES_PER_TYPE = 8;
+export const RECOMMENDATION_MEDIA_TYPES = ['movie', 'serie', 'anime', 'book'] as const;
+export const MAX_RECOMMENDATION_CANDIDATES =
+  MAX_RECOMMENDATION_CANDIDATES_PER_TYPE * RECOMMENDATION_MEDIA_TYPES.length;
+
+const RECOMMENDATION_MEDIA_TYPE_SET = new Set<string>(RECOMMENDATION_MEDIA_TYPES);
+
 /**
  * Parses the raw Gemini response into validated recommendations.
  *
@@ -22,6 +30,26 @@ export function parseRecommendations(raw: string | null): Recommendation[] | nul
   } catch {
     return null;
   }
+}
+
+/**
+ * Keeps at most MAX_RECOMMENDATIONS_PER_TYPE items for each supported media type.
+ *
+ * @param items - Validated recommendations that already have a cover.
+ * @returns The recommendations limited per media type, preserving the original order.
+ */
+export function limitRecommendationsPerType(items: Recommendation[]): Recommendation[] {
+  const counts = new Map<string, number>();
+
+  return items.filter((item) => {
+    if (!RECOMMENDATION_MEDIA_TYPE_SET.has(item.mediaType)) return false;
+
+    const count = counts.get(item.mediaType) ?? 0;
+    if (count >= MAX_RECOMMENDATIONS_PER_TYPE) return false;
+
+    counts.set(item.mediaType, count + 1);
+    return true;
+  });
 }
 
 function extractJson(raw: string): string {

@@ -306,9 +306,10 @@ curl -X DELETE "http://localhost:5000/api/v1/64b7c9f5e4b0d5a1f8e9a123" \
 ### **5. Get personalized recommendations**
 - **Endpoint:** `/recommendations`
 - **Method:** `GET`
-- **Description:** Uses the authenticated user's media history to generate up to 10 suggestions with Gemini, resolves covers from Rotten Tomatoes or Open Library, discards every recommendation without a verified cover, and returns at most 5.
+- **Description:** Uses the authenticated user's media history to generate up to 8 suggestions per media type (32 total) with Gemini, resolves covers from AniList (anime), Rotten Tomatoes (movies/series), or Open Library (books), discards every recommendation without a verified cover, and returns at most 6 per media type (24 total).
 - **Authentication:** Required (`Authorization: Bearer <token>`).
 - **Environment:** Requires `GEMINI_API_KEY`.
+- **Anime:** Covers are resolved from AniList; if AniList has no match, Rotten Tomatoes is tried as a fallback.
 - **Books:** Gemini must return a valid ISBN. Books without an ISBN or without an Open Library cover are discarded.
 - **Response codes:**
   - `200 OK`: Array of recommendations (may be empty if no candidate had a cover).

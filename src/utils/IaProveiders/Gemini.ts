@@ -1,6 +1,7 @@
 import { Media } from "../types.js";
 import { IProvider } from "./Iprovider.js";
 import { GoogleGenAI } from "@google/genai";
+import { MAX_RECOMMENDATION_CANDIDATES, MAX_RECOMMENDATION_CANDIDATES_PER_TYPE } from "../recommendations.js";
 
 /**
  * GeminiProvider is an implementation of the IProvider interface that leverages Google Gemini AI
@@ -55,12 +56,12 @@ export class GeminiProvider implements IProvider {
 
         const response = await this.getClient().models.generateContent({
             model: "gemini-3-flash-preview",
-            contents: `Act as an expert movie, series, and book critic and recommendation engine. Your goal is to analyze the user's consumption history and suggest up to 10 new titles.
+            contents: `Act as an expert movie, series, anime, and book critic and recommendation engine. Your goal is to analyze the user's consumption history and suggest up to ${MAX_RECOMMENDATION_CANDIDATES_PER_TYPE} new titles for each media type (movie, serie, anime, book), for a maximum of ${MAX_RECOMMENDATION_CANDIDATES} titles.
 
 Strict Rules:
 1. Analyze the 'score' to understand genres and styles preference.
 2. Analyze 'completedDate' to prioritize recent interests.
-3. Maintain a variety of 'mediaTypes', but ensure the majority of recommendations match the user's most-watched categories.
+3. Cover all four 'mediaTypes' (movie, serie, anime, book), with up to ${MAX_RECOMMENDATION_CANDIDATES_PER_TYPE} recommendations per type. Within each type, prioritize genres and styles the user already enjoys.
 4. DO NOT recommend titles already present in the user's history.
 5. For book recommendations include a valid ISBN-10 or ISBN-13 in 'isbn'. Use null for every other media type.
 6. Respond ONLY with a valid JSON array. Do not use markdown or add any text outside the array.

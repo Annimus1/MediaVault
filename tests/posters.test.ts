@@ -26,27 +26,70 @@ describe('getPosters', () => {
     expect(result.poster).toBe('https://img.example/movie.jpg');
   });
 
-  it('resolves serie and anime posters from the TV section', async () => {
+  it('resolves serie posters from the TV section', async () => {
     mockedAxios.get.mockResolvedValue({
       data: '<meta property="og:image" content="https://img.example/tv.jpg">'
     } as any);
 
-    const [serie, anime] = await getPosters([
-      { name: 'The Wire', mediaType: 'serie', reason: 'test', matchPercentage: 90 },
-      { name: 'Cowboy Bebop', mediaType: 'anime', reason: 'test', matchPercentage: 90 }
+    const [serie] = await getPosters([
+      { name: 'The Wire', mediaType: 'serie', reason: 'test', matchPercentage: 90 }
     ]);
 
-    expect(mockedAxios.get).toHaveBeenNthCalledWith(
-      1,
+    expect(mockedAxios.get).toHaveBeenCalledWith(
       'https://www.rottentomatoes.com/tv/the_wire',
       expect.objectContaining({ timeout: expect.any(Number) })
     );
-    expect(mockedAxios.get).toHaveBeenNthCalledWith(
-      2,
+    expect(serie.poster).toBe('https://img.example/tv.jpg');
+  });
+
+  it('resolves anime posters from AniList', async () => {
+    mockedAxios.post.mockResolvedValue({
+      data: {
+        data: {
+          Page: {
+            media: [
+              {
+                coverImage: {
+                  extraLarge: 'https://img.example/anime.jpg',
+                  large: 'https://img.example/anime-large.jpg'
+                }
+              }
+            ]
+          }
+        }
+      }
+    } as any);
+
+    const [anime] = await getPosters([
+      { name: 'Cowboy Bebop', mediaType: 'anime', reason: 'test', matchPercentage: 90 }
+    ]);
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      'https://graphql.anilist.co',
+      expect.objectContaining({ variables: { search: 'Cowboy Bebop' } }),
+      expect.objectContaining({ timeout: expect.any(Number) })
+    );
+    expect(mockedAxios.get).not.toHaveBeenCalled();
+    expect(anime.poster).toBe('https://img.example/anime.jpg');
+  });
+
+  it('falls back to Rotten Tomatoes when AniList has no anime cover', async () => {
+    mockedAxios.post.mockResolvedValue({
+      data: { data: { Page: { media: [] } } }
+    } as any);
+    mockedAxios.get.mockResolvedValue({
+      data: '<meta property="og:image" content="https://img.example/tv.jpg">'
+    } as any);
+
+    const [anime] = await getPosters([
+      { name: 'Cowboy Bebop', mediaType: 'anime', reason: 'test', matchPercentage: 90 }
+    ]);
+
+    expect(mockedAxios.post).toHaveBeenCalled();
+    expect(mockedAxios.get).toHaveBeenCalledWith(
       'https://www.rottentomatoes.com/tv/cowboy_bebop',
       expect.objectContaining({ timeout: expect.any(Number) })
     );
-    expect(serie.poster).toBe('https://img.example/tv.jpg');
     expect(anime.poster).toBe('https://img.example/tv.jpg');
   });
 
@@ -114,6 +157,7 @@ describe('getPosters', () => {
     ]);
 
     expect(mockedAxios.get).not.toHaveBeenCalled();
+    expect(mockedAxios.post).not.toHaveBeenCalled();
     expect(mockedAxios.head).not.toHaveBeenCalled();
     expect(result.poster).toBeNull();
   });

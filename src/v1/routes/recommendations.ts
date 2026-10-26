@@ -4,7 +4,7 @@ import IaProvider from '../../utils/IaProveiders/Provider.js';
 import { getUserInfo } from '../../utils/tokens.js';
 import { getAllMedia } from '../../db/mongo.js';
 import { getPosters } from '../../utils/Posters.js';
-import { parseRecommendations } from '../../utils/recommendations.js';
+import { limitRecommendationsPerType, parseRecommendations } from '../../utils/recommendations.js';
 
 const router = Router();
 
@@ -51,9 +51,9 @@ router.get('/recommendations', authMiddleware, async (req, res) => {
     }
 
     const withPosters = await getPosters(parsed);
-    const recommendations = withPosters
-      .filter((item) => typeof item.poster === 'string' && item.poster.length > 0)
-      .slice(0, 5);
+    const recommendations = limitRecommendationsPerType(
+      withPosters.filter((item) => typeof item.poster === 'string' && item.poster.length > 0)
+    );
 
     res.send(recommendations);
   } catch (error) {
