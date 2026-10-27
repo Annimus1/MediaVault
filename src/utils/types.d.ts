@@ -38,6 +38,15 @@ export interface Media {
 
 export type MediaSchema = Omit<Media, id>
 
+export interface Recommendation {
+  name: string;
+  mediaType: string;
+  reason: string;
+  matchPercentage: number;
+  poster?: string | null;
+  isbn?: string;
+}
+
 export interface IAuthToken extends Document {
   owner: Types.ObjectId;  // Referencia al usuario
   token: string;          // Token JWT

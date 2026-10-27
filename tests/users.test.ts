@@ -1,6 +1,6 @@
 import request from 'supertest';
+import { app } from '../src/app.js';
 import { closeDB, dbConnection } from '../src/db/mongo.js';
-import { app } from '../src/app';
 import { UserSchema } from '../src/db/Models/User.js';
 import { AuthTokenModel } from '../src/db/Models/Auth.js';
 
@@ -10,11 +10,12 @@ describe('Authentication Endpoints - /api/v1/auth', () => {
   // conection to the database before all tests
   beforeAll(async () => {
     await dbConnection();
+    await UserSchema.deleteMany({ user: 'test' }).exec();
   });
 
   // close the connection to the database after all tests
   afterAll(async () => {
-    const query = UserSchema.deleteMany({user: "test 2"});
+    const query = UserSchema.deleteMany({ user: 'test' });
     await query.exec();
 
     const query2 = AuthTokenModel.deleteMany({});
